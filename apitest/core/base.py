@@ -146,6 +146,7 @@ class Base(_TestCase):
     status_types_expected: _Union[_List[_Union[int, str]], _Tuple[_Union[int, str]]],
     msg = None
   ):
+    """断言。如果响应状态码符合预期的状态类型集，则失败。"""
     for status_type_expected in status_types_expected:
       self._assertStatusTypeBase(status_code, status_type_expected, msg = msg, assert_is = True)
 
@@ -155,6 +156,7 @@ class Base(_TestCase):
     status_types_expected: _Union[_List[_Union[int, str]], _Tuple[_Union[int, str]]],
     msg = None
   ):
+    """断言。如果响应状态码符合预期的状态类型集，则失败。"""
     for status_type_expected in status_types_expected:
       self._assertStatusTypeBase(status_code, status_type_expected, msg = msg, assert_is = False)
 
