@@ -2,7 +2,7 @@ from typing import \
   Union as _Union, \
   List as _List,   \
   Tuple as _Tuple, \
-  overload as _overload
+  overload
 from unittest.util import safe_repr as _safe_repr
 from unittest import TestCase as _TestCase
 
@@ -34,7 +34,7 @@ class Base(_TestCase):
       case 'server_error':
         return 500
       case _:
-        return None
+        raise ValueError(f'Unknown status type: {status_type}')
 
   def _assertStatusTypeBase(
     self,
@@ -74,7 +74,7 @@ class Base(_TestCase):
         )
         self.fail(self._formatMessage(msg, standard_msg))
 
-  def assertStatusCodeEqual(self, status_code: int, status_code_expected: int, msg = None) -> None:
+  def assertStatusCodeIs(self, status_code: int, status_code_expected: int, msg = None) -> None:
     """断言。如果响应状态码不等于预期，则失败。"""
     if not status_code == status_code_expected:
       msg = self._formatMessage(msg, '响应状态码 %s 不等于 %s' % (
@@ -83,7 +83,7 @@ class Base(_TestCase):
       ))
       raise self.failureException(msg)
 
-  def assertStatusCodeNotEqual(self, status_code: int, status_codes_expected: int, msg = None) -> None:
+  def assertStatusCodeIsNot(self, status_code: int, status_codes_expected: int, msg = None) -> None:
     """断言。如果响应状态码等于预期，则失败。"""
     if not status_code != status_codes_expected:
       msg = self._formatMessage(msg, '响应状态码 %s 等于 %s' % (
@@ -120,20 +120,20 @@ class Base(_TestCase):
       )
       self.fail(self._formatMessage(msg, standard_msg))
 
-  @_overload
+  @overload
   def assertStatusTypeIs(self, status_code: int, status_type_expected: str, msg = None): ...
 
-  @_overload
+  @overload
   def assertStatusTypeIs(self, status_code: int, status_type_expected: int, msg = None): ...
 
   def assertStatusTypeIs(self, status_code: int, status_type_expected, msg = None):
     """断言。如果响应状态码不是预期的状态类型，则失败。"""
     self._assertStatusTypeBase(status_code, status_type_expected, msg = msg, assert_is = True)
 
-  @_overload
+  @overload
   def assertStatusTypeIsNot(self, status_code: int, status_type_expected: str, msg = None): ...
 
-  @_overload
+  @overload
   def assertStatusTypeIsNot(self, status_code: int, status_type_expected: int, msg = None): ...
 
   def assertStatusTypeIsNot(self, status_code: int, status_type_expected, msg = None):
