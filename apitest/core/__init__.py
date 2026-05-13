@@ -41,11 +41,18 @@ class APITest(
     #      'type_in':['informational', 'redirection'],
     #      'type_not_in':[],
     #    },
+    #    'headers': {
+    #    },
+    #    'data': {
+    #      size: ...
+    #      data_type: ...
+    #      data: ...
+    #    }
     #  }
     #},
     {'url': 'https://app.pre.mieco.net/ht-printer/v1/c/res/app/upgrade/', 'method': 'get', 'assertions': {
       'response_time': {
-        'less': 0.01
+        'less_equal': 0.01
       },
       'status': {
         'type_in': [201],
