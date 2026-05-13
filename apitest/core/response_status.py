@@ -7,7 +7,7 @@ from unittest.util import safe_repr as _safe_repr
 from unittest import TestCase as _TestCase
 
 
-class Base(_TestCase):
+class ResponseStatusBase(_TestCase):
   """接口测试用例基类"""
 
   @staticmethod
@@ -39,9 +39,10 @@ class Base(_TestCase):
   def _assertStatusTypeBase(
     self,
     status_code: int,
-    status_type_expected,
-    msg = None,
-    assert_is: bool = False
+    status_type_expected: _Union[int, str],
+    status_types_container: _Union[_List[_Union[int, str]], _Tuple[_Union[int, str]], None] = None,
+    assertion_type: _Union[str, None] = None,
+    msg = None
   ) -> None:
     status_prefix: int
 
@@ -59,20 +60,37 @@ class Base(_TestCase):
 
     a = status_code - status_prefix
 
-    if assert_is:
-      if not 0 <= a < 100:
-        standard_msg = '响应状态码 %s 不属于响应状态 %s' % (
-          _safe_repr(status_code),
-          _safe_repr(status_type_expected)
-        )
-        self.fail(self._formatMessage(msg, standard_msg))
-    else:
-      if 0 <= a < 100:
-        standard_msg = '响应状态码 %s 属于响应状态 %s' % (
-          _safe_repr(status_code),
-          _safe_repr(status_type_expected)
-        )
-        self.fail(self._formatMessage(msg, standard_msg))
+    match assertion_type:
+      case 'is':
+        if not 0 <= a < 100:
+          standard_msg = '响应状态码 %s 不属于响应状态 %s' % (
+            _safe_repr(status_code),
+            _safe_repr(status_type_expected)
+          )
+          self.fail(self._formatMessage(msg, standard_msg))
+      case 'is_not':
+        if 0 <= a < 100:
+          standard_msg = '响应状态码 %s 属于响应状态 %s' % (
+            _safe_repr(status_code),
+            _safe_repr(status_type_expected)
+          )
+          self.fail(self._formatMessage(msg, standard_msg))
+      case 'in':
+        if not 0 <= a < 100:
+          standard_msg = '响应状态码 %s 不属于响应状态 %s' % (
+            _safe_repr(status_code),
+            _safe_repr(status_types_container)
+          )
+          self.fail(self._formatMessage(msg, standard_msg))
+      case 'not_in':
+        if 0 <= a < 100:
+          standard_msg = '响应状态码 %s 属于响应状态 %s' % (
+            _safe_repr(status_code),
+            _safe_repr(status_types_container)
+          )
+          self.fail(self._formatMessage(msg, standard_msg))
+      case _:
+        raise ValueError(f'Unknown assertion type: {assertion_type}')
 
   def assertStatusCodeIs(self, status_code: int, status_code_expected: int, msg = None) -> None:
     """断言。如果响应状态码不等于预期，则失败。"""
@@ -128,7 +146,7 @@ class Base(_TestCase):
 
   def assertStatusTypeIs(self, status_code: int, status_type_expected, msg = None):
     """断言。如果响应状态码不是预期的状态类型，则失败。"""
-    self._assertStatusTypeBase(status_code, status_type_expected, msg = msg, assert_is = True)
+    self._assertStatusTypeBase(status_code, status_type_expected, assertion_type = 'is', msg = msg)
 
   @overload
   def assertStatusTypeIsNot(self, status_code: int, status_type_expected: str, msg = None): ...
@@ -138,7 +156,7 @@ class Base(_TestCase):
 
   def assertStatusTypeIsNot(self, status_code: int, status_type_expected, msg = None):
     """断言。如果响应状态码是预期的状态类型，则失败。"""
-    self._assertStatusTypeBase(status_code, status_type_expected, msg = msg, assert_is = False)
+    self._assertStatusTypeBase(status_code, status_type_expected, assertion_type = 'is_not', msg = msg)
 
   def assertStatusTypeIn(
     self,
@@ -148,7 +166,13 @@ class Base(_TestCase):
   ):
     """断言。如果响应状态码符合预期的状态类型集，则失败。"""
     for status_type_expected in status_types_expected:
-      self._assertStatusTypeBase(status_code, status_type_expected, msg = msg, assert_is = True)
+      self._assertStatusTypeBase(
+        status_code,
+        status_type_expected,
+        status_types_container = status_types_expected,
+        assertion_type = 'in',
+        msg = msg
+      )
 
   def assertStatusTypeNotIn(
     self,
@@ -158,5 +182,11 @@ class Base(_TestCase):
   ):
     """断言。如果响应状态码符合预期的状态类型集，则失败。"""
     for status_type_expected in status_types_expected:
-      self._assertStatusTypeBase(status_code, status_type_expected, msg = msg, assert_is = False)
+      self._assertStatusTypeBase(
+        status_code,
+        status_type_expected,
+        status_types_container = status_types_expected,
+        assertion_type = 'not_in',
+        msg = msg
+      )
 
