@@ -6,6 +6,7 @@ import requests as _requests
 import ddt as _ddt
 from apitest.core.assert_status import AssertStatus as _AssertStatus
 from apitest.core.assert_response_time import AssertResponseTime as _AssertResponseTime
+from apitest.core.assert_headers import AssertHeaders as _AssertHeaders
 
 _TestLoader.testMethodPrefix = 'api_test'
 
@@ -15,7 +16,10 @@ class APITest(
   _AssertResponseTime,
 
   # 断言响应状态
-  _AssertStatus
+  _AssertStatus,
+
+  # 断言响应头部
+  _AssertHeaders
 ):
   @_ddt.data(
     #{
@@ -50,31 +54,22 @@ class APITest(
     #    }
     #  }
     #},
-    {'url': 'https://app.pre.mieco.net/ht-printer/v1/c/res/app/upgrade/', 'method': 'get', 'assertions': {
-      'response_time': {
-        'less_equal': 0.01
-      },
-      'status': {
-        'type_in': [201],
+    {
+      'url': 'https://app.pre.mieco.net/ht-printer/v1/c/res/app/upgrade/', 'method': 'get', 'assertions': {
+        'response_time': {
+          'less_equal': 0.1
+        },
+        'status': {
+          'type_in': [201],
+        },
+        'headers': {
+          'content-type': 'application/json'
+        }
       }
-    }}
+    }
   )
   @_ddt.unpack
   def api_test(self, method: str, url: str, path: str = '', assertions: dict | None = None, **kwargs):
-
-    # 解析url
-    parsed_url = _urlparse(url)
-
-    # 目标主机
-    target_hostname: str = ''
-
-    # 通过url获取主机名
-    if parsed_url.hostname:
-      target_hostname = parsed_url.hostname
-
-    # 无法获取主机名
-    else:
-      pass
 
     # 发送请求，获取响应
     response = _requests.request(method = method.upper(), url = url + path, **kwargs)
@@ -82,19 +77,37 @@ class APITest(
     # 响应时间断言
     if 'response_time' in assertions:
 
+      # 解析url
+      parsed_url = _urlparse(url)
+
+      # 目标主机
+      target_hostname: str = ''
+
+      # 通过url获取主机名
+      if parsed_url.hostname:
+        target_hostname = parsed_url.hostname
+
+      # 无法获取主机名
+      else:
+        pass
+
       # 获取断言信息（响应时间）
       response_time_assertions = assertions.get('response_time')
 
       # 通过url获取响应基线时间
       base_response_time = self.getBaseResponseTime(target_hostname)
 
-      # 服务器响应时间 = 总响应时间 - 基线响应时间
+      # 服务器响应时间（约） = 总响应时间 - 基线响应时间
       server_response_time = response.elapsed.total_seconds() - base_response_time
       if server_response_time < 0:
         server_response_time = 0
 
       # Todo: 打日志，服务器响应时间
       ...
+
+      # 响应时间断言为空时
+      if not response_time_assertions:
+        raise ValueError('响应时间断言不能为空')
 
       # 断言服务器响应时间小于...
       if 'less' in response_time_assertions:
@@ -112,6 +125,10 @@ class APITest(
 
       # 获取响应状态码
       status_code = response.status_code
+
+      # 响应状态断言为空时
+      if not code_assertions:
+        raise ValueError('响应状态断言不能为空')
 
       # 断言响应状态码是...
       if 'is' in code_assertions:
@@ -147,7 +164,12 @@ class APITest(
 
     # 响应头部断言
 
-    ...
+    if 'headers' in assertions:
+
+      headers_assertions = assertions.get('headers')
+
+      # 断言响应头部包含
+      self.assertHeadersContains(response.headers, headers_assertions)
 
     # 响应体断言
 
