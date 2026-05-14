@@ -3,7 +3,12 @@ from apitest.core.util import safe_repr as _safe_repr
 from apitest.core.util import CaseInsensitiveDict as _CaseInsensitiveDict
 
 class AssertHeaders(_TestCase):
-  def assertHeadersContains(self, headers: _CaseInsensitiveDict, headers_subset: _CaseInsensitiveDict, msg=None):
+
+  def assertHeadersContains(self,
+    headers: _CaseInsensitiveDict,
+    headers_subset: _CaseInsensitiveDict,
+    msg=None
+  ):
     """检查HTTP头部是否包含子集"""
 
     missing = []
@@ -31,3 +36,4 @@ class AssertHeaders(_TestCase):
       standard_msg += 'HTTP头部值不匹配: %s' % ','.join(mismatched)
 
     self.fail(self._formatMessage(msg, standard_msg))
+
