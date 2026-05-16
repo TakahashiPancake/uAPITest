@@ -98,7 +98,7 @@ class APITest(
       base_response_time = self.getBaseResponseTime(target_hostname)
 
       # 服务器响应时间（约）（毫秒） = 总响应时间（毫秒） - 基线响应时间（毫秒）
-      server_response_time = int(response.elapsed.total_seconds() * 1000 - base_response_time)
+      server_response_time = int((response.elapsed.total_seconds() - base_response_time) * 1000)
       if server_response_time < 0:
         server_response_time = 0
 
