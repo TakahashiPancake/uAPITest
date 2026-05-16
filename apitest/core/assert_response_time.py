@@ -8,7 +8,7 @@ from apitest.core.util import IP as _IP, IPv6 as _IPv6, TCP as _TCP
 class AssertResponseTime(_TestCase):
 
   @staticmethod
-  def getBaseResponseTime(target, port=80, timeout=3) -> float | None:
+  def getBaseResponseTime(target, port=80, timeout=3) -> int | None:
     """
     获取基线响应时间
 
@@ -51,21 +51,21 @@ class AssertResponseTime(_TestCase):
     # 计算响应时间
     response_time = end_time - start_time
 
-    # 返回响应时间
-    return response_time
+    # 返回响应时间（毫秒）
+    return int(response_time * 1000)
 
 
-  def assertResponseTimeLess(self, response_time: float, expected_response_time: float, msg = None):
+  def assertResponseTimeLess(self, response_time: int, expected_response_time: int, msg = None):
     if not response_time < expected_response_time:
-      standard_msg = '响应时间 %s 不小于预期时间 %s' % (
+      standard_msg = '响应时间 %s （毫秒）不小于预期时间 %s （毫秒）' % (
         _safe_repr(response_time),
         _safe_repr(expected_response_time)
       )
       self.fail(self._formatMessage(msg, standard_msg))
 
-  def assertResponseTimeLessEqual(self, response_time: float, expected_response_time: float, msg = None):
+  def assertResponseTimeLessEqual(self, response_time: int, expected_response_time: int, msg = None):
     if not response_time <= expected_response_time:
-      standard_msg = '响应时间 %s 大于预期时间 %s' % (
+      standard_msg = '响应时间 %s （毫秒）大于预期时间 %s （毫秒）' % (
         _safe_repr(response_time),
         _safe_repr(expected_response_time)
       )

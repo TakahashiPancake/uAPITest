@@ -57,7 +57,7 @@ class APITest(
     {
       'url': 'https://app.pre.mieco.net/ht-printer/v1/c/res/app/upgrade/', 'method': 'get', 'assertions': {
         'response_time': {
-          'less_equal': 0.1
+          'less_equal': 100
         },
         'status': {
           'type_in': [201],
@@ -97,8 +97,8 @@ class APITest(
       # 通过url获取响应基线时间
       base_response_time = self.getBaseResponseTime(target_hostname)
 
-      # 服务器响应时间（约） = 总响应时间 - 基线响应时间
-      server_response_time = response.elapsed.total_seconds() - base_response_time
+      # 服务器响应时间（约）（毫秒） = 总响应时间（毫秒） - 基线响应时间（毫秒）
+      server_response_time = int(response.elapsed.total_seconds() * 1000 - base_response_time)
       if server_response_time < 0:
         server_response_time = 0
 
