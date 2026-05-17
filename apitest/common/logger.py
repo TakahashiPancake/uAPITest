@@ -1,0 +1,55 @@
+import sys as _sys
+import logging
+
+
+def create_logger(name: str = "default_logger", level: int = logging.DEBUG) -> logging.Logger:
+  """
+  创建一个配置好的日志器，包含控制台输出和文件输出。
+  """
+  logger_01 = logging.getLogger(name)
+
+  # 避免重复添加Handler
+  if logger_01.handlers:
+    return logger_01
+
+  logger_01.setLevel(level)
+
+  # 定义日志格式
+  formatter = logging.Formatter(
+    '%(asctime)-16s | %(levelname)+10s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+  )
+
+  # 过滤器 - 输出到stdout
+  class StdOutFilter(logging.Filter):
+    def filter(self, record):
+      return record.levelno <= logging.INFO
+
+  # 过滤器 - 输出到stderr
+  class StdErrFilter(logging.Filter):
+    def filter(self, record):
+      return record.levelno > logging.INFO
+
+  # 控制台处理器（warning级别以下）
+  console_handler_stdout = logging.StreamHandler(_sys.stdout)
+  console_handler_stdout.addFilter(StdOutFilter())
+  console_handler_stdout.setLevel(logging.DEBUG)
+  console_handler_stdout.setFormatter(formatter)
+  logger_01.addHandler(console_handler_stdout)
+
+  # 控制台处理器（warning级别至warning级别以上）
+  console_handler_stderr = logging.StreamHandler(_sys.stderr)
+  console_handler_stderr.addFilter(StdErrFilter())
+  console_handler_stderr.setLevel(logging.WARNING)
+  console_handler_stderr.setFormatter(formatter)
+  logger_01.addHandler(console_handler_stderr)
+
+  # 文件处理器
+  #file_handler = logging.FileHandler('app.log', encoding='utf-8')
+  #file_handler.setLevel(logging.DEBUG)
+  #file_handler.setFormatter(formatter)
+  #logger.addHandler(file_handler)
+
+  return logger_01
+
+logger = create_logger()
