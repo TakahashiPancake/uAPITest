@@ -1,12 +1,14 @@
 import time as _time
-from scapy.all import sr1
+from scapy.all import sr1 as _sr1
 from apitest.util import IP as _IP, IPv6 as _IPv6, TCP as _TCP
-from apitest.common import logger
+from apitest.common import create_logger as _create_logger
+
+_logger = _create_logger('net_tools')
 
 class NetTools(object):
 
   @staticmethod
-  def getResponseTime(target, port: int = 80, timeout: int = 3000) -> int | None:
+  def get_response_time(target, port: int = 80, timeout: int = 3000) -> int | None:
     """
     获取响应时间
 
@@ -23,8 +25,7 @@ class NetTools(object):
     """
     # 构造 TCP SYN 数据包
     # 尝试构造IPv4包
-    logger.debug(f'尝试获取目标响应基准时间')
-    logger.debug(f'目标: {target}, 端口 {port}')
+    _logger.debug(f'目标: {target}, 端口: {port}')
     try:
       packet = _IP(dst=target) / _TCP(dport=port, flags="S")
 
@@ -38,10 +39,10 @@ class NetTools(object):
     # 记录发送前的时间
     start_time = _time.time()
 
-    logger.debug(f'发送数据包: {packet}')
+    _logger.debug(f'发送数据包: {packet}')
 
     # 发送数据包并等待响应
-    response = sr1(packet, timeout = timeout / 1000, verbose=0)
+    response = _sr1(packet, timeout = timeout / 1000, verbose=0)
 
     # 记录收到响应后的时间
     end_time = _time.time()
@@ -50,12 +51,12 @@ class NetTools(object):
     if response is None:
       raise TimeoutError('服务器连接超时')
 
-    logger.debug(f'响应数据包: {response}')
+    _logger.debug(f'获取到的响应数据包: {response}')
 
     # 计算响应时间
     response_time = int((end_time - start_time) * 1000)
 
-    logger.debug(f'{target} {port} 端口响应时间: {response_time} 毫秒')
+    _logger.debug(f'目标: {target}, 端口: {port}; 响应时间: {response_time} 毫秒')
 
     # 返回响应时间（毫秒）
     return response_time
