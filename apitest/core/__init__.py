@@ -7,6 +7,7 @@ import ddt as _ddt
 from apitest.core.assert_status import AssertStatus as _AssertStatus
 from apitest.core.assert_response_time import AssertResponseTime as _AssertResponseTime
 from apitest.core.assert_headers import AssertHeaders as _AssertHeaders
+from apitest.feature import net_tools as _net_tools
 
 _TestLoader.testMethodPrefix = 'api_test'
 
@@ -60,7 +61,7 @@ class APITest(
           'less_equal': 100
         },
         'status': {
-          'type_in': [201],
+          'type_in': [200],
         },
         'headers': {
           'content-type': 'application/json'
@@ -171,7 +172,13 @@ class APITest(
       # 断言响应头部包含
       self.assertHeadersContains(response.headers, headers_assertions)
 
+    # 响应体大小断言
+    print(response.content)
+    print(response.text)
+
     # 响应体断言
 
-    ...
+  @staticmethod
+  def getBaseResponseTime(target, port: int = 80, timeout: int = 3000):
+    return _net_tools.getResponseTime(target, port = port, timeout = timeout)
 
