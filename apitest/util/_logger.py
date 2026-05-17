@@ -2,22 +2,21 @@ import sys as _sys
 import logging
 
 
-def create_logger(name: str = "default_logger", level: int = logging.DEBUG) -> logging.Logger:
+def create_logger(name: str = "Main", level: int = logging.DEBUG) -> logging.Logger:
   """
   创建一个配置好的日志器，包含控制台输出和文件输出。
   """
-  logger_app = logging.getLogger(name)
+  logger = logging.getLogger(name)
 
   # 避免重复添加Handler
-  if logger_app.handlers:
-    return logger_app
+  if logger.handlers:
+    return logger
 
-  logger_app.setLevel(level)
+  logger.setLevel(level)
 
   # 定义日志格式
   formatter = logging.Formatter(
-    '%(asctime)-16s | %(levelname)+10s | %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    '[ %(name)-10s ] %(asctime)-24s | %(levelname)+8s | %(message)s'
   )
 
   # 过滤器 - 输出到stdout
@@ -35,14 +34,14 @@ def create_logger(name: str = "default_logger", level: int = logging.DEBUG) -> l
   console_handler_stdout.addFilter(StdOutFilter())
   console_handler_stdout.setLevel(logging.DEBUG)
   console_handler_stdout.setFormatter(formatter)
-  logger_app.addHandler(console_handler_stdout)
+  logger.addHandler(console_handler_stdout)
 
   # 控制台handler（warning级别至warning级别以上）
   console_handler_stderr = logging.StreamHandler(_sys.stderr)
   console_handler_stderr.addFilter(StdErrFilter())
   console_handler_stderr.setLevel(logging.WARNING)
   console_handler_stderr.setFormatter(formatter)
-  logger_app.addHandler(console_handler_stderr)
+  logger.addHandler(console_handler_stderr)
 
   # Todo: 加入文件handler
   # 文件handler
@@ -51,6 +50,5 @@ def create_logger(name: str = "default_logger", level: int = logging.DEBUG) -> l
   #file_handler.setFormatter(formatter)
   #logger.addHandler(file_handler)
 
-  return logger_app
+  return logger
 
-logger = create_logger()
