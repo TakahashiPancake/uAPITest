@@ -6,13 +6,13 @@ def create_logger(name: str = "default_logger", level: int = logging.DEBUG) -> l
   """
   创建一个配置好的日志器，包含控制台输出和文件输出。
   """
-  logger_01 = logging.getLogger(name)
+  logger_app = logging.getLogger(name)
 
   # 避免重复添加Handler
-  if logger_01.handlers:
-    return logger_01
+  if logger_app.handlers:
+    return logger_app
 
-  logger_01.setLevel(level)
+  logger_app.setLevel(level)
 
   # 定义日志格式
   formatter = logging.Formatter(
@@ -30,26 +30,27 @@ def create_logger(name: str = "default_logger", level: int = logging.DEBUG) -> l
     def filter(self, record):
       return record.levelno > logging.INFO
 
-  # 控制台处理器（warning级别以下）
+  # 控制台handler（warning级别以下）
   console_handler_stdout = logging.StreamHandler(_sys.stdout)
   console_handler_stdout.addFilter(StdOutFilter())
   console_handler_stdout.setLevel(logging.DEBUG)
   console_handler_stdout.setFormatter(formatter)
-  logger_01.addHandler(console_handler_stdout)
+  logger_app.addHandler(console_handler_stdout)
 
-  # 控制台处理器（warning级别至warning级别以上）
+  # 控制台handler（warning级别至warning级别以上）
   console_handler_stderr = logging.StreamHandler(_sys.stderr)
   console_handler_stderr.addFilter(StdErrFilter())
   console_handler_stderr.setLevel(logging.WARNING)
   console_handler_stderr.setFormatter(formatter)
-  logger_01.addHandler(console_handler_stderr)
+  logger_app.addHandler(console_handler_stderr)
 
-  # 文件处理器
+  # Todo: 加入文件handler
+  # 文件handler
   #file_handler = logging.FileHandler('app.log', encoding='utf-8')
   #file_handler.setLevel(logging.DEBUG)
   #file_handler.setFormatter(formatter)
   #logger.addHandler(file_handler)
 
-  return logger_01
+  return logger_app
 
 logger = create_logger()
