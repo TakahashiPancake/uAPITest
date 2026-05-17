@@ -8,6 +8,7 @@ from apitest.core.assert_status import AssertStatus as _AssertStatus
 from apitest.core.assert_response_time import AssertResponseTime as _AssertResponseTime
 from apitest.core.assert_headers import AssertHeaders as _AssertHeaders
 from apitest.feature import net_tools as _net_tools
+from apitest.common import default_logger as _default_logger
 
 _TestLoader.testMethodPrefix = 'api_test'
 
@@ -72,6 +73,9 @@ class APITest(
   @_ddt.unpack
   def api_test(self, method: str, url: str, path: str = '', assertions: dict | None = None, **kwargs):
 
+    # 输出接口、请求方法、请求参数等信息
+    _default_logger.info(f'API: {url+path}; Method: {method}')
+
     # 发送请求，获取响应
     response = _requests.request(method = method.upper(), url = url + path, **kwargs)
 
@@ -92,16 +96,24 @@ class APITest(
       else:
         pass
 
+      _default_logger.debug(f'目标主机: {target_hostname}')
+
       # 获取断言信息（响应时间）
       response_time_assertions = assertions.get('response_time')
+
+      # 总响应时间（毫秒）
+      total_response_time = int(response.elapsed.total_seconds() * 1000)
+      _default_logger.debug(f'总响应时间 {total_response_time} 毫秒')
 
       # 通过url获取响应基线时间
       base_response_time = self.getBaseResponseTime(target_hostname)
 
       # 服务器响应时间（约）（毫秒） = 总响应时间（毫秒） - 基线响应时间（毫秒）
-      server_response_time = int((response.elapsed.total_seconds() * 1000 - base_response_time))
+      server_response_time = total_response_time - base_response_time
       if server_response_time < 0:
         server_response_time = 0
+
+      _default_logger.debug(f'相对响应时间: {server_response_time} 毫秒')
 
       # Todo: 打日志，服务器响应时间
       ...
@@ -180,5 +192,6 @@ class APITest(
 
   @staticmethod
   def getBaseResponseTime(target, port: int = 80, timeout: int = 3000):
-    return _net_tools.getResponseTime(target, port = port, timeout = timeout)
+    _default_logger.debug(f'尝试获取目标响应基准时间')
+    return _net_tools.get_response_time(target, port = port, timeout = timeout)
 
