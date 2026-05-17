@@ -28,8 +28,7 @@ class AssertHeaders(_TestCase):
 
     standard_msg = ''
     if missing:
-      standard_msg = 'HTTP头部缺失键: %s' % ','.join(_safe_repr(m) for m in
-                                             missing)
+      standard_msg = 'HTTP头部缺失键: %s' % ','.join(_safe_repr(m) for m in missing)
     if mismatched:
       if standard_msg:
         standard_msg += '; '
