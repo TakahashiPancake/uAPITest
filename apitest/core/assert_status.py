@@ -4,7 +4,7 @@ from typing import \
   Tuple as _Tuple, \
   overload
 from unittest import TestCase as _TestCase
-from apitest.core.util import safe_repr as _safe_repr
+from apitest.util import safe_repr as _safe_repr
 
 
 
