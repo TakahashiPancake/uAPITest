@@ -10,7 +10,6 @@ from apitest.core.assertion import AssertResponseTime as _AssertResponseTime
 from apitest.core.assertion import AssertHeaders as _AssertHeaders
 from apitest.core.assertion import AssertContentSize as _AssertContentSize
 from apitest.core.test import Test as _Test
-from apitest.core.tool import TestTool as _TestTool
 from apitest.common import create_logger as _create_logger
 
 _TestLoader.testMethodPrefix = 'api_test'
@@ -34,8 +33,6 @@ class APITest(
   # 断言响应体大小
   _AssertContentSize,
 
-  # 加入测试工具
-  _TestTool
 ):
   @_ddt.data(
     #{
