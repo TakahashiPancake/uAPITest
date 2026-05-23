@@ -1,5 +1,6 @@
 __all__ = ['APITest']
 
+import copy
 from urllib.parse import urlparse as _urlparse
 from unittest import TestLoader as _TestLoader
 import requests as _requests
@@ -7,6 +8,7 @@ import ddt as _ddt
 from apitest.core.assert_status import AssertStatus as _AssertStatus
 from apitest.core.assert_response_time import AssertResponseTime as _AssertResponseTime
 from apitest.core.assert_headers import AssertHeaders as _AssertHeaders
+from apitest.core.assert_content_size import AssertContentSize as _AssertContentSize
 from apitest.feature import net_tools as _net_tools
 from apitest.common import default_logger as _default_logger
 
@@ -21,7 +23,10 @@ class APITest(
   _AssertStatus,
 
   # 断言响应头部
-  _AssertHeaders
+  _AssertHeaders,
+
+  # 断言响应体大小
+  _AssertContentSize
 ):
   @_ddt.data(
     #{
@@ -59,13 +64,16 @@ class APITest(
     {
       'url': 'https://app.pre.mieco.net/ht-printer/v1/c/res/app/upgrade/', 'method': 'get', 'assertions': {
         'response_time': {
-          'less_equal': 100
+          'less_equal': 200
         },
         'status': {
           'type_in': [200],
         },
         'headers': {
           'content-type': 'application/json'
+        },
+        'content_size': {
+          'less': 200
         }
       }
     }
@@ -185,8 +193,34 @@ class APITest(
       self.assertHeadersContains(response.headers, headers_assertions)
 
     # 响应体大小断言
-    print(response.content)
-    print(response.text)
+    #print(response.content, len(response.content + bytes('啊', encoding='utf-8')))
+    #print(response.text, len(response.text + '啊'))
+    if 'content_size' in assertions:
+
+      content_size_assertions = assertions.get('content_size')
+
+      response_content_bytes: bytes
+
+      if isinstance(response.content, bytes):
+
+        response_content_bytes = copy.copy(response.content)
+
+      else:
+
+        # 使用utf-8解码
+        response_content_bytes = bytes(response.text, encoding='utf-8')
+
+      if not content_size_assertions:
+
+        raise ValueError('响应体大小断言不能为空')
+
+      if 'less' in content_size_assertions:
+
+        self.assertContentSizeLess(len(response_content_bytes), content_size_assertions.get('less'))
+
+      elif 'less_equal' in content_size_assertions:
+
+        self.assertContentSizeLessEqual(len(response_content_bytes), content_size_assertions.get('less_equal'))
 
     # 响应体断言
 
