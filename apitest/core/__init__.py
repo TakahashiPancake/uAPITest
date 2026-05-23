@@ -1,21 +1,27 @@
 __all__ = ['APITest']
 
-import copy
+import copy as _copy
 from urllib.parse import urlparse as _urlparse
 from unittest import TestLoader as _TestLoader
 import requests as _requests
 import ddt as _ddt
-from apitest.core.assert_status import AssertStatus as _AssertStatus
-from apitest.core.assert_response_time import AssertResponseTime as _AssertResponseTime
-from apitest.core.assert_headers import AssertHeaders as _AssertHeaders
-from apitest.core.assert_content_size import AssertContentSize as _AssertContentSize
-from apitest.feature import net_tools as _net_tools
-from apitest.common import default_logger as _default_logger
+from apitest.core.assertion import AssertStatus as _AssertStatus
+from apitest.core.assertion import AssertResponseTime as _AssertResponseTime
+from apitest.core.assertion import AssertHeaders as _AssertHeaders
+from apitest.core.assertion import AssertContentSize as _AssertContentSize
+from apitest.core.test import Test as _Test
+from apitest.core.tool import TestTool as _TestTool
+from apitest.common import create_logger as _create_logger
 
 _TestLoader.testMethodPrefix = 'api_test'
 
+_logger = _create_logger('core_main')
+
 @_ddt.ddt
 class APITest(
+  # 测试
+  _Test,
+
   # 断言响应时间
   _AssertResponseTime,
 
@@ -26,7 +32,10 @@ class APITest(
   _AssertHeaders,
 
   # 断言响应体大小
-  _AssertContentSize
+  _AssertContentSize,
+
+  # 加入测试工具
+  _TestTool
 ):
   @_ddt.data(
     #{
@@ -79,13 +88,13 @@ class APITest(
     }
   )
   @_ddt.unpack
-  def api_test(self, method: str, url: str, path: str = '', assertions: dict | None = None, **kwargs):
+  def api_test(self, method: str, url: str, assertions: dict | None = None, **kwargs):
 
     # 输出接口、请求方法、请求参数等信息
-    _default_logger.info(f'API: {url+path}; Method: {method}')
+    _logger.info(f'URL: {url}; Method: {method}')
 
     # 发送请求，获取响应
-    response = _requests.request(method = method.upper(), url = url + path, **kwargs)
+    response = _requests.request(method = method.upper(), url = url, **kwargs)
 
     # 响应时间断言
     if 'response_time' in assertions:
@@ -104,39 +113,12 @@ class APITest(
       else:
         pass
 
-      _default_logger.debug(f'目标主机: {target_hostname}')
+      _logger.debug(f'目标主机: {target_hostname}')
 
       # 获取断言信息（响应时间）
       response_time_assertions = assertions.get('response_time')
 
-      # 总响应时间（毫秒）
-      total_response_time = int(response.elapsed.total_seconds() * 1000)
-      _default_logger.debug(f'总响应时间 {total_response_time} 毫秒')
-
-      # 通过url获取响应基线时间
-      base_response_time = self.getBaseResponseTime(target_hostname)
-
-      # 服务器响应时间（约）（毫秒） = 总响应时间（毫秒） - 基线响应时间（毫秒）
-      server_response_time = total_response_time - base_response_time
-      if server_response_time < 0:
-        server_response_time = 0
-
-      _default_logger.debug(f'相对响应时间: {server_response_time} 毫秒')
-
-      # Todo: 打日志，服务器响应时间
-      ...
-
-      # 响应时间断言为空时
-      if not response_time_assertions:
-        raise ValueError('响应时间断言不能为空')
-
-      # 断言服务器响应时间小于...
-      if 'less' in response_time_assertions:
-        self.assertResponseTimeLess(server_response_time, response_time_assertions.get('less'))
-
-      # 断言服务器响应时间小于等于...
-      elif 'less_equal' in response_time_assertions:
-        self.assertResponseTimeLessEqual(server_response_time, response_time_assertions.get('less_equal'))
+      self.test_response_time(target_hostname, response, response_time_assertions)
 
     # 响应状态码断言
     if 'status' in assertions:
@@ -203,7 +185,7 @@ class APITest(
 
       if isinstance(response.content, bytes):
 
-        response_content_bytes = copy.copy(response.content)
+        response_content_bytes = _copy.copy(response.content)
 
       else:
 
@@ -213,7 +195,7 @@ class APITest(
       # 响应体大小
       response_content_size: int = len(response_content_bytes)
 
-      _default_logger.debug(f'响应体大小: {response_content_size} 字节')
+      _logger.debug(f'响应体大小: {response_content_size} 字节')
 
       if not content_size_assertions:
 
@@ -228,9 +210,4 @@ class APITest(
         self.assertContentSizeLessEqual(response_content_size, content_size_assertions.get('less_equal'))
 
     # 响应体断言
-
-  @staticmethod
-  def getBaseResponseTime(target, port: int = 80, timeout: int = 3000):
-    _default_logger.debug(f'尝试获取目标响应基准时间')
-    return _net_tools.get_response_time(target, port = port, timeout = timeout)
 
