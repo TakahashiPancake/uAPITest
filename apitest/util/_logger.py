@@ -2,7 +2,7 @@ import sys as _sys
 import logging
 
 
-def create_logger(name: str = "Main", level: int = logging.DEBUG) -> logging.Logger:
+def create_logger(name: str, level: int = logging.DEBUG) -> logging.Logger:
   """
   创建一个配置好的日志器，包含控制台输出和文件输出。
   """
@@ -16,7 +16,7 @@ def create_logger(name: str = "Main", level: int = logging.DEBUG) -> logging.Log
 
   # 定义日志格式
   formatter = logging.Formatter(
-    '[ %(name)-10s ] %(asctime)-24s | %(levelname)+8s | %(message)s'
+    '[ %(name)-10s ] %(asctime)-24s | %(levelname)-8s | %(message)s'
   )
 
   # 过滤器 - 输出到stdout
