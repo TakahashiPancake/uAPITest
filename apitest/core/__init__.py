@@ -207,8 +207,13 @@ class APITest(
 
       else:
 
-        # 使用utf-8解码
+        # 默认使用utf-8解码html文本
         response_content_bytes = bytes(response.text, encoding='utf-8')
+
+      # 响应体大小
+      response_content_size: int = len(response_content_bytes)
+
+      _default_logger.debug(f'响应体大小: {response_content_size} 字节')
 
       if not content_size_assertions:
 
@@ -216,11 +221,11 @@ class APITest(
 
       if 'less' in content_size_assertions:
 
-        self.assertContentSizeLess(len(response_content_bytes), content_size_assertions.get('less'))
+        self.assertContentSizeLess(response_content_size, content_size_assertions.get('less'))
 
       elif 'less_equal' in content_size_assertions:
 
-        self.assertContentSizeLessEqual(len(response_content_bytes), content_size_assertions.get('less_equal'))
+        self.assertContentSizeLessEqual(response_content_size, content_size_assertions.get('less_equal'))
 
     # 响应体断言
 
