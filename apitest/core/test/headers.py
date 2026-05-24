@@ -19,5 +19,5 @@ class TestHeaders(_AssertHeaders):
 
     # 断言响应头部
     self.assertHeadersContains(headers, headers_assertions)
-    _logger_test.info(f'成功: 响应头部 {headers} 包含 {headers_assertions}')
+    _logger_test.info(f'成功: {headers_assertions} 在响应头部 {headers} 中')
 
