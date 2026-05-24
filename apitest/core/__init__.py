@@ -10,6 +10,7 @@ from apitest.core.assertion import AssertResponseTime as _AssertResponseTime
 from apitest.core.assertion import AssertHeaders as _AssertHeaders
 from apitest.core.assertion import AssertContentSize as _AssertContentSize
 from apitest.core.test import Test as _Test
+from apitest.feature import net_tools as _net_tools
 from apitest.common import create_logger as _create_logger
 
 _TestLoader.testMethodPrefix = 'api_test'
@@ -20,12 +21,6 @@ _logger = _create_logger('core_main')
 class APITest(
   # 测试
   _Test,
-
-  # 断言响应时间
-  _AssertResponseTime,
-
-  # 断言响应状态
-  _AssertStatus,
 
   # 断言响应头部
   _AssertHeaders,
@@ -112,10 +107,24 @@ class APITest(
 
       _logger.debug(f'目标主机: {target_hostname}')
 
+      # 总响应时间（毫秒）
+      total_response_time = int(response.elapsed.total_seconds() * 1000)
+      _logger.debug(f'总响应时间 {total_response_time} 毫秒')
+
+      # 通过url获取响应基线时间
+      base_response_time = _net_tools.get_response_time(target_hostname)
+
+      # 服务器响应时间（约）（毫秒） = 总响应时间（毫秒） - 基线响应时间（毫秒）
+      server_response_time = total_response_time - base_response_time
+      if server_response_time < 0:
+        server_response_time = 0
+
+      _logger.debug(f'相对响应时间: {server_response_time} 毫秒')
+
       # 获取断言信息（响应时间）
       response_time_assertions = assertions.get('response_time')
 
-      self.test_response_time(target_hostname, response, response_time_assertions)
+      self.test_response_time(server_response_time, response_time_assertions)
 
     # 响应状态码断言
     if 'status' in assertions:
@@ -126,41 +135,7 @@ class APITest(
       # 获取响应状态码
       status_code = response.status_code
 
-      # 响应状态断言为空时
-      if not code_assertions:
-        raise ValueError('响应状态断言不能为空')
-
-      # 断言响应状态码是...
-      if 'is' in code_assertions:
-        self.assertStatusCodeIs(status_code, code_assertions.get('is'))
-
-      # 断言响应状态码不是...
-      elif 'is_not' in code_assertions:
-        self.assertStatusCodeIsNot(status_code, code_assertions.get('is_not'))
-
-      # 断言响应状态码在...
-      if 'in' in code_assertions:
-        self.assertStatusCodeIn(status_code, code_assertions.get('in'))
-
-      # 断言响应状态码不在...
-      elif 'not_in' in code_assertions:
-        self.assertStatusCodeNotIn(status_code, code_assertions.get('not_in'))
-
-      # 断言响应状态类型是...
-      if 'type_is' in code_assertions:
-        self.assertStatusTypeIs(status_code, code_assertions.get('type_is'))
-
-      # 断言响应状态类型不是...
-      elif 'type_is_not' in code_assertions:
-        self.assertStatusTypeIsNot(status_code, code_assertions.get('type_is_not'))
-
-      # 断言响应状态类型在...
-      if 'type_in' in code_assertions:
-        self.assertStatusTypeIn(status_code, code_assertions.get('type_in'))
-
-      # 断言响应状态类型不在...
-      elif 'type_not_in' in code_assertions:
-        self.assertStatusTypeNotIn(status_code, code_assertions.get('type_not_in'))
+      self.test_status_code(status_code, code_assertions)
 
     # 响应头部断言
 
