@@ -9,9 +9,9 @@ class TestContentSize(_AssertContentSize):
 
     if 'less' in content_size_assertions:
       self.assertContentSizeLess(content_size, content_size_assertions.get('less'))
-      _logger_test.info(f'成功: 响应体大小 {content_size} 小于 {content_size_assertions.get("less")}')
+      _logger_test.info(f'成功: 响应体大小 {content_size} (字节) 小于 {content_size_assertions.get("less")} (字节)')
 
     elif 'less_equal' in content_size_assertions:
       self.assertContentSizeLessEqual(content_size, content_size_assertions.get('less_equal'))
-      _logger_test.info(f'成功: 响应体大小 {content_size} 不大于 {content_size_assertions.get("less_equal")}')
+      _logger_test.info(f'成功: 响应体大小 {content_size} (字节) 不大于 {content_size_assertions.get("less_equal")} (字节)')
 
