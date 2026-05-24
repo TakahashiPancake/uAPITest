@@ -1,4 +1,5 @@
 from apitest.core.assertion import AssertResponseTime as _AssertResponseTime
+from apitest.core.test.util import logger_test as _logger_test
 
 class TestResponseTime(_AssertResponseTime):
 
@@ -18,7 +19,9 @@ class TestResponseTime(_AssertResponseTime):
     # 断言服务器响应时间小于...
     if 'less' in response_time_assertions:
       self.assertResponseTimeLess(response_time, response_time_assertions.get('less'))
+      _logger_test.info(f'成功: 响应时间 {response_time} 毫秒小于预期 {response_time_assertions.get("less")}')
 
     # 断言服务器响应时间小于等于...
     elif 'less_equal' in response_time_assertions:
       self.assertResponseTimeLessEqual(response_time, response_time_assertions.get('less_equal'))
+      _logger_test.info(f'成功: 响应时间 {response_time} 毫秒不大于预期 {response_time_assertions.get("less_equal")}')
