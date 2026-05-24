@@ -25,3 +25,4 @@ class TestResponseTime(_AssertResponseTime):
     elif 'less_equal' in response_time_assertions:
       self.assertResponseTimeLessEqual(response_time, response_time_assertions.get('less_equal'))
       _logger_test.info(f'成功: 响应时间 {response_time} 毫秒不大于预期 {response_time_assertions.get("less_equal")}')
+

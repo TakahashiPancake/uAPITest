@@ -22,9 +22,6 @@ class APITest(
   # 测试
   _Test,
 
-  # 断言响应头部
-  _AssertHeaders,
-
   # 断言响应体大小
   _AssertContentSize,
 
@@ -124,6 +121,7 @@ class APITest(
       # 获取断言信息（响应时间）
       response_time_assertions = assertions.get('response_time')
 
+      # 测试响应时间
       self.test_response_time(server_response_time, response_time_assertions)
 
     # 响应状态码断言
@@ -138,17 +136,14 @@ class APITest(
       self.test_status_code(status_code, code_assertions)
 
     # 响应头部断言
-
     if 'headers' in assertions:
 
       headers_assertions = assertions.get('headers')
 
-      # 断言响应头部包含
-      self.assertHeadersContains(response.headers, headers_assertions)
+      # 测试响应头部
+      self.test_headers(response.headers, headers_assertions)
 
     # 响应体大小断言
-    #print(response.content, len(response.content + bytes('啊', encoding='utf-8')))
-    #print(response.text, len(response.text + '啊'))
     if 'content_size' in assertions:
 
       content_size_assertions = assertions.get('content_size')
