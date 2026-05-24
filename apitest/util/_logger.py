@@ -20,28 +20,33 @@ def create_logger(name: str, level: int = logging.DEBUG) -> logging.Logger:
   )
 
   # 过滤器 - 输出到stdout
-  class StdOutFilter(logging.Filter):
-    def filter(self, record):
-      return record.levelno <= logging.INFO
+  #class StdOutFilter(logging.Filter):
+  #  def filter(self, record):
+  #    return record.levelno <= logging.INFO
 
   # 过滤器 - 输出到stderr
-  class StdErrFilter(logging.Filter):
-    def filter(self, record):
-      return record.levelno > logging.INFO
+  #class StdErrFilter(logging.Filter):
+  #  def filter(self, record):
+  #    return record.levelno > logging.INFO
 
   # 控制台handler（warning级别以下）
-  console_handler_stdout = logging.StreamHandler(_sys.stdout)
-  console_handler_stdout.addFilter(StdOutFilter())
-  console_handler_stdout.setLevel(logging.DEBUG)
-  console_handler_stdout.setFormatter(formatter)
-  logger.addHandler(console_handler_stdout)
+  #console_handler_stdout = logging.StreamHandler(_sys.stdout)
+  #console_handler_stdout.addFilter(StdOutFilter())
+  #console_handler_stdout.setLevel(logging.DEBUG)
+  #console_handler_stdout.setFormatter(formatter)
+  #logger.addHandler(console_handler_stdout)
 
   # 控制台handler（warning级别至warning级别以上）
-  console_handler_stderr = logging.StreamHandler(_sys.stderr)
-  console_handler_stderr.addFilter(StdErrFilter())
-  console_handler_stderr.setLevel(logging.WARNING)
-  console_handler_stderr.setFormatter(formatter)
-  logger.addHandler(console_handler_stderr)
+  #console_handler_stderr = logging.StreamHandler(_sys.stderr)
+  #console_handler_stderr.addFilter(StdErrFilter())
+  #console_handler_stderr.setLevel(logging.WARNING)
+  #console_handler_stderr.setFormatter(formatter)
+  #logger.addHandler(console_handler_stderr)
+
+  console_handler = logging.StreamHandler(stream=_sys.stderr)
+  console_handler.setLevel(logging.DEBUG)
+  console_handler.setFormatter(formatter)
+  logger.addHandler(console_handler)
 
   # Todo: 加入文件handler
   # 文件handler
