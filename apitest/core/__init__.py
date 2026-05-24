@@ -66,13 +66,47 @@ class APITest(_Test):
     }
   )
   @_ddt.unpack
-  def api_test(self, method: str, url: str, assertions: dict | None = None, **kwargs):
+  def api_test(
+    self,
+    method: str,
+    url: str,
+    params: dict | None = None,
+    data: dict | None = None,
+    json: dict | None = None,
+    headers: dict | None = None,
+    cookies: dict | None = None,
+    files: dict | None = None,
+    auth: list | None = None,
+    timeout: float | None = None,
+    allow_redirects: bool = False,
+    proxies: dict | None = None,
+    verify: bool | str | None = None,
+    stream: bool | None = None,
+    cert: str | None = None,
+    assertions: dict | None = None # 断言
+  ):
 
     # 输出接口、请求方法、请求参数等信息
     _logger.info(f'URL: {url}; Method: {method}')
 
     # 发送请求，获取响应
-    response = _requests.request(method = method.upper(), url = url, **kwargs)
+    response = _requests.request(
+      method  = method.upper(),
+      url     = url,
+      params  = params,
+      data    = data,
+      json    = json,
+      headers = headers,
+      cookies = cookies,
+      files   = files,
+      auth    = auth,
+      timeout = timeout,
+      allow_redirects = allow_redirects,
+      proxies = proxies,
+      verify  = verify,
+      stream  = stream,
+      cert    = cert,
+    )
 
     # 响应时间断言
     if 'response_time' in assertions:
