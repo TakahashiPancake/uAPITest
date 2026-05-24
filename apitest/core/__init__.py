@@ -5,10 +5,6 @@ from urllib.parse import urlparse as _urlparse
 from unittest import TestLoader as _TestLoader
 import requests as _requests
 import ddt as _ddt
-from apitest.core.assertion import AssertStatus as _AssertStatus
-from apitest.core.assertion import AssertResponseTime as _AssertResponseTime
-from apitest.core.assertion import AssertHeaders as _AssertHeaders
-from apitest.core.assertion import AssertContentSize as _AssertContentSize
 from apitest.core.test import Test as _Test
 from apitest.feature import net_tools as _net_tools
 from apitest.common import create_logger as _create_logger
@@ -18,14 +14,7 @@ _TestLoader.testMethodPrefix = 'api_test'
 _logger = _create_logger('core_main')
 
 @_ddt.ddt
-class APITest(
-  # 测试
-  _Test,
-
-  # 断言响应体大小
-  _AssertContentSize,
-
-):
+class APITest(_Test):
   @_ddt.data(
     #{
     #  'url': 'https://www.baidu.com/',
@@ -62,7 +51,7 @@ class APITest(
     {
       'url': 'https://app.pre.mieco.net/ht-printer/v1/c/res/app/upgrade/', 'method': 'get', 'assertions': {
         'response_time': {
-          'less_equal': 200
+          'less_equal': 100
         },
         'status': {
           'type_in': [200],
@@ -71,7 +60,7 @@ class APITest(
           'content-type': 'application/json'
         },
         'content_size': {
-          'less': 200
+          'less': 100
         }
       }
     }
@@ -162,19 +151,7 @@ class APITest(
       # 响应体大小
       response_content_size: int = len(response_content_bytes)
 
-      _logger.debug(f'响应体大小: {response_content_size} 字节')
-
-      if not content_size_assertions:
-
-        raise ValueError('响应体大小断言不能为空')
-
-      if 'less' in content_size_assertions:
-
-        self.assertContentSizeLess(response_content_size, content_size_assertions.get('less'))
-
-      elif 'less_equal' in content_size_assertions:
-
-        self.assertContentSizeLessEqual(response_content_size, content_size_assertions.get('less_equal'))
+      self.test_content_size(response_content_size, content_size_assertions)
 
     # 响应体断言
 
