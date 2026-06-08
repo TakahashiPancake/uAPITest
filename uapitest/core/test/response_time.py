@@ -1,5 +1,5 @@
-from apitest.core.assertion import AssertResponseTime as _AssertResponseTime
-from apitest.core.test.util import logger_test as _logger_test
+from uapitest.core.assertion import AssertResponseTime as _AssertResponseTime
+from uapitest.core.test.util import logger_test as _logger_test
 
 class TestResponseTime(_AssertResponseTime):
 

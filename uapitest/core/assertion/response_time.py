@@ -1,5 +1,5 @@
 from unittest import TestCase as _TestCase
-from apitest.util import safe_repr as _safe_repr
+from uapitest.util import safe_repr as _safe_repr
 
 
 class AssertResponseTime(_TestCase):

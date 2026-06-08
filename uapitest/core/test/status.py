@@ -1,5 +1,5 @@
-from apitest.core.assertion import AssertStatus as _AssertStatus
-from apitest.core.test.util import logger_test as _logger_test
+from uapitest.core.assertion import AssertStatus as _AssertStatus
+from uapitest.core.test.util import logger_test as _logger_test
 
 class TestStatus(_AssertStatus):
 

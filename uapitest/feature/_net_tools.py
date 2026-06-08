@@ -1,7 +1,7 @@
 import time as _time
 from scapy.all import sr1 as _sr1
-from apitest.util import IP as _IP, IPv6 as _IPv6, TCP as _TCP
-from apitest.common import create_logger as _create_logger
+from uapitest.util import IP as _IP, IPv6 as _IPv6, TCP as _TCP
+from uapitest.common import create_logger as _create_logger
 
 _logger = _create_logger('net_tools')
 

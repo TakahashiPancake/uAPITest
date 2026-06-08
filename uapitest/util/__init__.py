@@ -5,4 +5,4 @@ from requests.structures import CaseInsensitiveDict
 from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 from scapy.layers.inet6 import IPv6
-from apitest.util._logger import create_logger
+from uapitest.util._logger import create_logger

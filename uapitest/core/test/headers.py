@@ -1,6 +1,6 @@
-from apitest.util import CaseInsensitiveDict as _CaseInsensitiveDict
-from apitest.core.assertion import AssertHeaders as _AssertHeaders
-from apitest.core.test.util import logger_test as _logger_test
+from uapitest.util import CaseInsensitiveDict as _CaseInsensitiveDict
+from uapitest.core.assertion import AssertHeaders as _AssertHeaders
+from uapitest.core.test.util import logger_test as _logger_test
 
 class TestHeaders(_AssertHeaders):
 

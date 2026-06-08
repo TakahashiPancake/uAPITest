@@ -1,5 +1,5 @@
-from apitest.core.assertion import AssertContentSize as _AssertContentSize
-from apitest.core.test.util import logger_test as _logger_test
+from uapitest.core.assertion import AssertContentSize as _AssertContentSize
+from uapitest.core.test.util import logger_test as _logger_test
 
 class TestContentSize(_AssertContentSize):
   def test_content_size(self, content_size: int, content_size_assertions: dict) -> None:

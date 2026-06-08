@@ -1,6 +1,6 @@
 from unittest import TestCase as _TestCase
-from apitest.util import safe_repr as _safe_repr
-from apitest.util import CaseInsensitiveDict as _CaseInsensitiveDict
+from uapitest.util import safe_repr as _safe_repr
+from uapitest.util import CaseInsensitiveDict as _CaseInsensitiveDict
 
 class AssertHeaders(_TestCase):
 

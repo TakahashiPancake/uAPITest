@@ -5,9 +5,9 @@ from urllib.parse import urlparse as _urlparse
 from unittest import TestLoader as _TestLoader
 import requests as _requests
 import ddt as _ddt
-from apitest.core.test import Test as _Test
-from apitest.feature import net_tools as _net_tools
-from apitest.common import create_logger as _create_logger
+from uapitest.core.test import Test as _Test
+from uapitest.feature import net_tools as _net_tools
+from uapitest.common import create_logger as _create_logger
 
 _TestLoader.testMethodPrefix = 'api_test'
 
